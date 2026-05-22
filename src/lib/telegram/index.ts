@@ -17,6 +17,8 @@ const SYNTHETIC_IMAGE_DIMENSION = 1000
 const TITLE_PREVIEW_REGEX = /^.*?(?=[。\n]|http\S)/g
 const CONTENT_URL_REGEX = /(url\(["'])((https?:)?\/\/)/g
 const UNNECESSARY_HEADERS = new Set(['host', 'cookie', 'origin', 'referer'])
+const HR_PARAGRAPH_REGEX = /<p>---<\/p>/g
+const HR_TEXT_REGEX = /---/g
 
 type CacheValue = ChannelInfo | Post
 type MessageSelection = Cheerio<AnyNode>
@@ -416,6 +418,11 @@ async function modifyHTMLContent($: CheerioAPI, content: MessageSelection, optio
       console.error(error)
     }
   }
+
+  // Convert markdown-style horizontal rules (---) to <hr> tags
+  const htmlContent = content.html() ?? ''
+  const hrConvertedContent = htmlContent.replace(HR_PARAGRAPH_REGEX, '<hr>').replace(HR_TEXT_REGEX, '<hr>')
+  content.html(hrConvertedContent)
 
   return content
 }
