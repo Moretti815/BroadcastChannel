@@ -13,6 +13,9 @@ export interface SocialLinkOptions {
   twitter?: string
   github?: string
   telegram?: string
+  qq?: string
+  mail?: string
+  bilibili?: string
   discord?: string
   mastodon?: string
   bluesky?: string
@@ -86,6 +89,36 @@ export function buildSocialLinks(options: SocialLinkOptions): SocialLink[] {
       title: 'Mastodon',
       label: 'Mastodon',
       icon: 'ri:mastodon-line',
+      rel: 'noopener noreferrer',
+    })
+  }
+
+  if (options.qq) {
+    links.push({
+      href: `https://qm.qq.com/q/${options.qq}`,
+      title: 'QQ',
+      label: 'QQ',
+      icon: 'ri:qq-line',
+      rel: 'noopener noreferrer',
+    })
+  }
+
+  if (options.mail) {
+    links.push({
+      href: `mailto:${options.mail}`,
+      title: 'Mail',
+      label: 'Mail',
+      icon: 'ri:mail-line',
+      rel: 'noopener noreferrer',
+    })
+  }
+
+  if (options.bilibili) {
+    links.push({
+      href: `https://space.bilibili.com/${options.bilibili}`,
+      title: 'Bilibili',
+      label: 'Bilibili',
+      icon: 'ri:bilibili-line',
       rel: 'noopener noreferrer',
     })
   }

@@ -3,6 +3,7 @@ import '../styles/app.css'
 import { SEO } from 'astro-seo'
 import BackToTop from '../components/BackToTop.astro'
 import NavSidebar from '../components/NavSidebar.astro'
+import ThemeToggle from '../components/ThemeToggle.astro'
 import { getEnv, parseDelimitedItems } from '../lib/env'
 import { getPageSeo } from '../lib/seo'
 
@@ -28,6 +29,9 @@ const FOOTER_INJECT = getEnv(import.meta.env, Astro, 'FOOTER_INJECT')
 const TAGS = getEnv(import.meta.env, Astro, 'TAGS')
 const LINKS = getEnv(import.meta.env, Astro, 'LINKS')
 const navs = parseDelimitedItems(getEnv(import.meta.env, Astro, 'NAVS'))
+const themeCookie = Astro.cookies.get('theme')?.value
+const initialTheme = themeCookie === 'dark' || themeCookie === 'light' ? themeCookie : undefined
+const initialThemeColor = initialTheme === 'dark' ? '#1c1a18' : '#f4f1ec'
 
 const layoutShellClass = 'mx-5'
 const layoutGridClass = 'mx-auto flex w-full max-w-4xl flex-col md:flex-row-reverse md:items-start'
@@ -40,11 +44,40 @@ const skipLinkText = 'Skip to main content'
 ---
 
 <!doctype html>
-<html lang={locale ?? 'en'}>
+<html lang={locale ?? 'en'} class:list={[initialTheme]} style={{ backgroundColor: initialThemeColor }}>
   <head>
+    <script is:inline>
+      ;(function () {
+        const saved = localStorage.getItem('theme')
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        const isDark = saved === 'dark' || (!saved && prefersDark)
+
+        document.documentElement.classList.toggle('dark', isDark)
+        document.documentElement.classList.toggle('light', !isDark)
+        document.documentElement.style.backgroundColor = isDark ? '#1c1a18' : '#f4f1ec'
+
+        const mt = document.querySelector('meta[name="theme-color"]')
+        if (mt) {
+          mt.setAttribute('content', isDark ? '#1c1a18' : '#f4f1ec')
+        }
+
+        if (!saved) {
+          window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            document.documentElement.classList.toggle('dark', e.matches)
+            document.documentElement.classList.toggle('light', !e.matches)
+            document.documentElement.style.backgroundColor = e.matches ? '#1c1a18' : '#f4f1ec'
+            const m = document.querySelector('meta[name="theme-color"]')
+            if (m) {
+              m.setAttribute('content', e.matches ? '#1c1a18' : '#f4f1ec')
+            }
+          })
+        }
+      })()
+    </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f4f1ec" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content={initialThemeColor} />
     <link rel="alternate" type="application/rss+xml" title={`${RSS_PREFIX}${channel?.title}`} href={RSS_URL} />
     <SEO
       titleTemplate={hasCustomTitle ? `%s | ${siteTitle}` : undefined}
@@ -86,5 +119,6 @@ const skipLinkText = 'Skip to main content'
       <BackToTop />
     </div>
     <Fragment set:html={FOOTER_INJECT} />
+    <ThemeToggle />
   </body>
 </html>

@@ -92,5 +92,23 @@ export async function modifyHTMLContent($: CheerioAPI, content: MessageSelection
     }
   }
 
+  // Convert standalone horizontal rule markers (---, ***, ___) to <hr>
+  convertHorizontalRules($, content)
+
   return content
+}
+
+function convertHorizontalRules($: CheerioAPI, element: MessageSelection): void {
+  for (const node of element.contents().toArray()) {
+    if (node.type === 'text') {
+      const text = $(node).text()
+      const trimmed = text.trim()
+      if (/^-{2,}$/.test(trimmed)) {
+        $(node).replaceWith('<hr>')
+      }
+    }
+    else if (node.type === 'tag' && !['pre', 'code', 'a'].includes(node.tagName)) {
+      convertHorizontalRules($, $(node) as MessageSelection)
+    }
+  }
 }

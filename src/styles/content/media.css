@@ -2,9 +2,9 @@
   .content {
     img:not(.tg-emoji):not(.sticker):not(.link_preview_image):not(.modal-img) {
       @apply rounded-media border border-line shadow-soft;
-      width: calc(100% - var(--box-margin));
-      max-width: calc(100% - 1px);
-      max-height: initial;
+      max-width: 50%;
+      height: auto;
+      width: auto;
     }
 
     .image-list-container {

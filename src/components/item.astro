@@ -99,6 +99,7 @@ const commentsClass = `${timelineRailClass} pb-6 pt-1.5`
       <section class={commentsClass} aria-label="Telegram comments">
         {/* Telegram comments are the only intentional client-side JS exception. */}
         <script
+          id="telegram-comments-widget"
           is:inline
           async
           src="https://telegram.org/js/telegram-widget.js"
@@ -107,6 +108,15 @@ const commentsClass = `${timelineRailClass} pb-6 pt-1.5`
           data-colorful="1"
           data-color="454545"
         />
+        <script is:inline>
+          (function () {
+            const script = document.getElementById('telegram-comments-widget')
+            if (script && document.documentElement.classList.contains('dark')) {
+              script.setAttribute('data-dark', '1')
+              script.setAttribute('data-color', 'e07030')
+            }
+          })()
+        </script>
       </section>
     )
   }
